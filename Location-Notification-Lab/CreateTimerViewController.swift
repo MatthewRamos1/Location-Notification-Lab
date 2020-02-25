@@ -17,7 +17,7 @@ class CreateTimerViewController: UIViewController {
     @IBOutlet weak var timerDescriptionField: UITextField!
     @IBOutlet weak var datePicker: UIDatePicker!
     
-    private var timeInterval: TimeInterval! = Date().timeIntervalSinceNow + 2
+    private var timeInterval: TimeInterval! = Date().timeIntervalSinceNow + 60
     weak private var delegate: CreateTimerControllerDelegate?
     
     override func viewDidLoad() {
@@ -27,9 +27,17 @@ class CreateTimerViewController: UIViewController {
     
     private func createLocalNotification() {
         let content = UNMutableNotificationContent()
-        content.title = timerDescriptionField.text ?? "Title"
-        content.body = "You have a \(Date(timeIntervalSinceNow: timeInterval)) timer"
-        content.subtitle = "Set to go off in \(timeInterval.description)"
+        guard let timerTitle = timerDescriptionField.text, !timerTitle.isEmpty else {
+            showAlert(title: "Missing Title", message: "Please enter a title in the required text field.")
+            return
+        }
+        content.title = timerTitle
+        let tempDate = Date(timeIntervalSinceNow: timeInterval)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let dateString = dateFormatter.string(from: tempDate)
+        content.body = "Set to go off at \(dateString)."
+        content.subtitle = "Your \(dateString) timer has gone off."
         content.sound = .default
         
         let identifier = UUID().uuidString
