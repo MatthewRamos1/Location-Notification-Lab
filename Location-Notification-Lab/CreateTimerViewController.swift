@@ -28,7 +28,7 @@ class CreateTimerViewController: UIViewController {
     private func createLocalNotification() {
         let content = UNMutableNotificationContent()
         content.title = timerDescriptionField.text ?? "Title"
-        content.body = "You have a \(datePicker.date.description) timer"
+        content.body = "You have a \(Date(timeIntervalSinceNow: timeInterval)) timer"
         content.subtitle = "Set to go off in \(timeInterval.description)"
         content.sound = .default
         
