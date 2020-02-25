@@ -32,10 +32,7 @@ class CreateTimerViewController: UIViewController {
             return
         }
         content.title = timerTitle
-        let tempDate = Date(timeIntervalSinceNow: timeInterval)
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let dateString = dateFormatter.string(from: tempDate)
+        let dateString = reformatDate(timeInterval)
         content.body = "Set to go off at \(dateString)."
         content.subtitle = "Your \(dateString) timer has gone off."
         content.sound = .default
@@ -66,8 +63,16 @@ class CreateTimerViewController: UIViewController {
                 }
             }
         }
-        
     }
+    
+    func reformatDate(_ input: TimeInterval) -> String {
+        let tempDate = Date(timeIntervalSinceNow: input)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let dateString = dateFormatter.string(from: tempDate)
+        return dateString
+    }
+    
     @IBAction func datePickerChanged(_ sender: UIDatePicker) {
         timeInterval = sender.countDownDuration
     }
