@@ -38,10 +38,10 @@ class CreateTimerViewController: UIViewController {
                 let attachment = try UNNotificationAttachment(identifier: identifier, url: imageURL, options: nil)
                 content.attachments = [attachment]
             } catch {
-//                showAlert(title: "Error", message: "Couldn't set attachment: \(error)")
+                showAlert(title: "Error", message: "Couldn't set attachment: \(error)")
             }
         } else {
-//            showAlert(title: "Error", message: "Image could not be found")
+            showAlert(title: "Error", message: "Image could not be found")
         }
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
@@ -49,9 +49,13 @@ class CreateTimerViewController: UIViewController {
         
         UNUserNotificationCenter.current().add(request) { (error) in
             if let error = error {
-                print("error adding request: \(error)")
+                DispatchQueue.main.async {
+                    self.showAlert(title: "Error", message: "Error adding request: \(error)")
+                }
             } else {
-                print("request was successfully added")
+                DispatchQueue.main.async {
+                    self.showAlert(title: "Success", message: "Timer was successfully added.")
+                }
             }
         }
         

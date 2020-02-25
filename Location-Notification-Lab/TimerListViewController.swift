@@ -43,16 +43,20 @@ class TimerListViewController: UIViewController {
                 self.timers = requests
                 DispatchQueue.main.async {
                     self.refreshControl.endRefreshing()
-                    print(self.timers.count)
                 }
             }
         }
+    
+    private func removeNotification(atIndexPath indexPath: IndexPath) {
+        let timer = timers[indexPath.row]
+        let identifier = timer.identifier
+        nCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+        timers.remove(at: indexPath.row)
+    }
         
         private func checkForNotificationAuthorization() {
             nCenter.getNotificationSettings { (settings) in
-                if settings.authorizationStatus == .authorized {
-                    print("app is authorized for notifications")
-                } else {
+                if settings.authorizationStatus != .authorized {
                     self.requestNotificationPermissions()
                 }
             }
@@ -61,17 +65,22 @@ class TimerListViewController: UIViewController {
         private func requestNotificationPermissions() {
             nCenter.requestAuthorization(options: [.alert, .sound]) { (granted, error) in
                 if let error = error {
-                    print("\(error)")
+                    DispatchQueue.main.async {
+                        self.showAlert(title: "Error", message: "Error with authorization: \(error)")
+                    }
                     return
                 }
                 if granted {
-                    print("granted")
+                    DispatchQueue.main.async {
+                        self.showAlert(title: "Accepted", message: "Notification permission has been granted.")
+                    }
                 } else {
-                    print("Denied")
+                    DispatchQueue.main.async {
+                        self.showAlert(title: "Failure", message: "Notifiction permission has been denied.")
+                    }
                 }
             }
         }
-        
     }
 
 extension TimerListViewController: UITableViewDataSource {
@@ -83,8 +92,14 @@ extension TimerListViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "timerCell", for: indexPath)
         let timer = timers[indexPath.row]
         cell.textLabel?.text = timer.content.title
-        print(timers.count)
+        cell.detailTextLabel?.text = timer.content.body
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            removeNotification(atIndexPath: indexPath)
+        }
     }
 }
 
